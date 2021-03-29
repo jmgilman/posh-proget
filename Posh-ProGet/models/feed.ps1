@@ -48,7 +48,7 @@ class Feed {
 class Connector {
     [string] $Name
     [string] $FeedType
-    [string] $Url
+    [string] $Url = ''
     [string] $Username
     [string] $Password
     [int] $Timeout
@@ -56,6 +56,15 @@ class Connector {
     [bool] $MetadataCacheEnabled
     [int] $MetadataCacheMinutes
     [int] $MetaDataCacheCount
+
+    static [Connector] FromJson([object] $JsonObject) {
+        $conn = [Connector]::new()
+        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
+            $conn.$($_.Name) = $JsonObject.$($_.Name)
+        }
+
+        return $conn
+    }
 }
 
 class RetentionRule {

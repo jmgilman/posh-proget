@@ -175,6 +175,43 @@ Function Get-Feeds {
 
 <#
 .SYNOPSIS
+    Fetches a list of all connectors from the ProGet API
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    all connectors, returning them as an array of Connector objects.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.EXAMPLE
+    $conns = Get-Connectors $session
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    An array of Connector objects
+#>
+Function Get-Connectors {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.list -f 'connectors') `
+            -Transform { [Connector]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to list connectors: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
     Fetches a feed with the given name
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and fetch
@@ -213,6 +250,50 @@ Function Get-Feed {
     }
     catch {
         Write-Error "Unable to get feed: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Fetches a connector with the given name
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    all connectors, returning them as an array of Connector objects.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER Name
+    The name of the connector to get
+.EXAMPLE
+    $conn = Get-Connector $session chocolatey-connector
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    A Connector object
+#>
+Function Get-Connector {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $Name
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.get -f 'connectors', $Name) `
+            -Transform { [Connector]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to get connector: $($_.ErrorDetails.Message)"
         return
     }
 }
@@ -267,6 +348,54 @@ Function New-Feed {
 
 <#
 .SYNOPSIS
+    Creates a new connector using the given Connector object
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and
+    create a new connector using the properties passed in the given Connector object.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER Connector
+    The Connector object to create the new connector with
+.EXAMPLE
+    $conn = New-ConnectorObject @{Name='chocolatey-connector'; FeedType='chocolatey'}
+    New-Connector $session $conn
+.INPUTS
+    The session and connector can be piped in by value
+.OUTPUTS
+    The newly created Connector object
+#>
+Function New-Connector {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 2
+        )]
+        [Connector] $Connector
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.create -f 'connectors') `
+            -Method POST `
+            -Data $Connector `
+            -Transform { [Connector]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to create new connector: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
     Updates an existing feed using the given Feed object
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
@@ -304,7 +433,7 @@ Function Set-Feed {
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -EndPoint ($FEED_ENDPOINTS.update -f 'feeds', $feed.Name) `
+            -EndPoint ($FEED_ENDPOINTS.update -f 'feeds', $Feed.Name) `
             -Method POST `
             -Data $Feed `
             -Transform { [Feed]::FromJson($_) }
@@ -317,7 +446,57 @@ Function Set-Feed {
 
 <#
 .SYNOPSIS
-    Removes the given feed name
+    Updates an existing connector using the given Connector object
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and
+    update a connector using the given Connector object. Note that the Name property of
+    the Connector object is what determines which connector is updated in the backend.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER Connector
+    The Connector object to use for updating
+.EXAMPLE
+    $conn = Get-Connector $session chocolatey-connector
+    $conn.Url = 'https://api.nuget.org/v3/index.json'
+    Set-Connector $session $conn
+.INPUTS
+    The session and connector can be piped in by value
+.OUTPUTS
+    The updated Connector object
+#>
+Function Set-Connector {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 2
+        )]
+        [Connector] $Connector
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.update -f 'connectors', $Connector.Name) `
+            -Method POST `
+            -Data $Connector `
+            -Transform { [Connector]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to update connector: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Removes the given feed
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
     removes the feed with the given feed name.
@@ -355,6 +534,52 @@ Function Remove-Feed {
     }
     catch {
         Write-Error "Unable to delete feed: $($_.ErrorDetails.Message)"
+        return $false
+    }
+
+    return $true
+}
+
+<#
+.SYNOPSIS
+    Removes the given connector
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and
+    removes the connector with the given connector name.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER Name
+    The name of the connector to remove
+.EXAMPLE
+    Remove-Connector $session chocolatey-connector
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    True if successful, otherwise false
+#>
+Function Remove-Connector {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $Name
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.delete -f 'connectors', $Name) `
+            -Method POST
+    }
+    catch {
+        Write-Error "Unable to delete connector: $($_.ErrorDetails.Message)"
         return $false
     }
 
