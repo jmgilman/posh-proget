@@ -1,12 +1,12 @@
 $ASSET_ENDPOINTS = @{
-    list      = '/endpoints/{0}/dir/{1}'
+    list      = '/endpoints/{0}/dir/{1}?recursive={2}'
     get       = '/endpoints/{0}/content/{1}'
     create    = '/endpoints/{0}/content/{1}'
     update    = '/endpoints/{0}/content/{1}'
     delete    = '/endpoints/{0}/delete/{1}'
     directory = '/endpoints/{0}/dir/{1}'
-    export    = '/endpoints/{0}/export/{1}'
-    import    = '/endpoints/{0}/import/{1}'
+    export    = '/endpoints/{0}/export/{1}?format={2}&recursive={3}'
+    import    = '/endpoints/{0}/import/{1}?format={2}&overwrite={3}'
 }
 
 <#
@@ -82,7 +82,7 @@ Function Get-Assets {
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -Endpoint (($ASSET_ENDPOINTS.list -f $FeedName, $Path) + "?recursive=$Recursive") `
+            -Endpoint ($ASSET_ENDPOINTS.list -f $FeedName, $Path, $Recursive) `
             -Transform { [Asset]::FromJson($_) }
     }
     catch {
@@ -441,7 +441,7 @@ Function Export-AssetDirectory {
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -Endpoint (($ASSET_ENDPOINTS.export -f $FeedName, $Path) + "?format=$Format&recursive=$Recursive") `
+            -Endpoint ($ASSET_ENDPOINTS.export -f $FeedName, $Path, $Format, $Recursive) `
             -OutFile $OutFile
     }
     catch {
@@ -508,7 +508,7 @@ Function Import-AssetDirectory {
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -Endpoint (($ASSET_ENDPOINTS.import -f $FeedName, $Path) + "?format=$Format&overwrite=$Overwrite") `
+            -Endpoint ($ASSET_ENDPOINTS.import -f $FeedName, $Path, $Format, $Overwrite) `
             -Method POST `
             -InFile $InFile
     }
