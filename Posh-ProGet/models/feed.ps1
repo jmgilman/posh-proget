@@ -109,9 +109,18 @@ class ReplicationData {
 
 class LicenseData {
     [string] $LicenseID
-    [string] $Title
+    [string] $Title = ''
     [string[]] $Urls
     [bool] $Allowed
-    [string[]] $AllowedFeeds
-    [string[]] $BlockedFeeds
+    [string[]] $AllowedFeeds = @()
+    [string[]] $BlockedFeeds = @()
+
+    static [LicenseData] FromJson([object] $JsonObject) {
+        $replication = [LicenseData]::new()
+        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
+            $replication.$($_.Name) = $JsonObject.$($_.Name)
+        }
+
+        return $replication
+    }
 }

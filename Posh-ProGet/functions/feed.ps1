@@ -212,10 +212,47 @@ Function Get-Connectors {
 
 <#
 .SYNOPSIS
+    Fetches a list of all licenses from the ProGet API
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    all licenses, returning them as an array of LicenseData objects.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.EXAMPLE
+    $lics = Get-Licenses $session
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    An array of LicenseData objects
+#>
+Function Get-Licenses {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.list -f 'licenses') `
+            -Transform { [LicenseData]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to list licenses $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
     Fetches a feed with the given name
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and fetch
-    all feeds, returning them as an array of Feed objects.
+    the given feed, returning it as a Feed object.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
 .PARAMETER Name
@@ -259,7 +296,7 @@ Function Get-Feed {
     Fetches a connector with the given name
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and fetch
-    all connectors, returning them as an array of Connector objects.
+    the given connector, returning it as a Connector object.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
 .PARAMETER Name
@@ -294,6 +331,50 @@ Function Get-Connector {
     }
     catch {
         Write-Error "Unable to get connector: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Fetches a license with the given ID
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    the given license, returning it as a LicenseData object.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER LicenseID
+    The ID of the license to get
+.EXAMPLE
+    $lic = Get-License $session MIT-CMU
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    A LicenseData object
+#>
+Function Get-License {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $LicenseID
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.get -f 'licenses', $LicenseID) `
+            -Transform { [LicenseData]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to get license: $($_.ErrorDetails.Message)"
         return
     }
 }
@@ -396,6 +477,55 @@ Function New-Connector {
 
 <#
 .SYNOPSIS
+    Creates a new license using the given License object
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and
+    create a new license using the properties passed in the given LicenseData 
+    object.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER LicenseData
+    The LicenseData object to create the new license with
+.EXAMPLE
+    $lic = New-LicenseDataObject @{LicenseID='my-license'; Title="My Licnse"; Urls=@('https://mysite.com/license.html')}
+    New-License $session $lic
+.INPUTS
+    The session and license can be piped in by value
+.OUTPUTS
+    The newly created LicenseData object
+#>
+Function New-License {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 2
+        )]
+        [LicenseData] $LicenseData
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.create -f 'licenses') `
+            -Method POST `
+            -Data $LicenseData `
+            -Transform { [LicenseData]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to create new license: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
     Updates an existing feed using the given Feed object
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
@@ -446,25 +576,26 @@ Function Set-Feed {
 
 <#
 .SYNOPSIS
-    Updates an existing connector using the given Connector object
+    Updates an existing license using the given LicenseData object
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
-    update a connector using the given Connector object. Note that the Name property of
-    the Connector object is what determines which connector is updated in the backend.
+    update a license using the given LicenseData object. Note that the LicenseID
+    property of the LicenseData object is what determines which license is 
+    updated in the backend.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
-.PARAMETER Connector
-    The Connector object to use for updating
+.PARAMETER LicenseData
+    The LicenseData object to use for updating
 .EXAMPLE
-    $conn = Get-Connector $session chocolatey-connector
-    $conn.Url = 'https://api.nuget.org/v3/index.json'
-    Set-Connector $session $conn
+    $lic = Get-License $session my-license
+    $lic.Allowed = $true
+    Set-License $session $lic
 .INPUTS
-    The session and connector can be piped in by value
+    The session and license can be piped in by value
 .OUTPUTS
-    The updated Connector object
+    The updated LicenseData object
 #>
-Function Set-Connector {
+Function Set-License {
     param(
         [Parameter(
             Mandatory = $true,
@@ -477,22 +608,23 @@ Function Set-Connector {
             ValueFromPipeline = $true,
             Position = 2
         )]
-        [Connector] $Connector
+        [LicenseData] $LicenseData
     )
 
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -EndPoint ($FEED_ENDPOINTS.update -f 'connectors', $Connector.Name) `
+            -EndPoint ($FEED_ENDPOINTS.update -f 'licenses', $LicenseData.LicenseID) `
             -Method POST `
-            -Data $Connector `
-            -Transform { [Connector]::FromJson($_) }
+            -Data $LicenseData `
+            -Transform { [LicenseData]::FromJson($_) }
     }
     catch {
-        Write-Error "Unable to update connector: $($_.ErrorDetails.Message)"
+        Write-Error "Unable to update license: $($_.ErrorDetails.Message)"
         return
     }
 }
+
 
 <#
 .SYNOPSIS
@@ -580,6 +712,52 @@ Function Remove-Connector {
     }
     catch {
         Write-Error "Unable to delete connector: $($_.ErrorDetails.Message)"
+        return $false
+    }
+
+    return $true
+}
+
+<#
+.SYNOPSIS
+    Removes the given license
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and
+    removes the license with the given license ID.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER LicenseID
+    The ID of the license to remove
+.EXAMPLE
+    Remove-License $session my-license
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    True if successful, otherwise false
+#>
+Function Remove-License {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $LicenseID
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.delete -f 'licenses', $LicenseID) `
+            -Method POST
+    }
+    catch {
+        Write-Error "Unable to delete license: $($_.ErrorDetails.Message)"
         return $false
     }
 
