@@ -103,12 +103,14 @@ Function Get-Assets {
     The name of the asset feed to fetch against
 .PARAMETER Path
     The relative path in the feed to the asset
+.PARAMETER OutFile
+    An optional local path to output the asset to
 .EXAMPLE
     $asset_contents = Get-Asset $session asset-feed path/to/asset.zip
 .INPUTS
     The session can be piped in by value
 .OUTPUTS
-    The contents of the requested asset
+    The raw contents of the requested asset if OutFile was not specified
 #>
 Function Get-Asset {
     param(
@@ -127,13 +129,15 @@ Function Get-Asset {
             Mandatory = $true,
             Position = 3
         )]
-        [string] $Path
+        [string] $Path,
+        [string] $OutFile
     )
     
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -Endpoint ($ASSET_ENDPOINTS.get -f $FeedName, $Path)
+            -Endpoint ($ASSET_ENDPOINTS.get -f $FeedName, $Path) `
+            -OutFile $OutFile
     }
     catch {
         Write-Error "Unable to get asset: $($_.ErrorDetails.Message)"
