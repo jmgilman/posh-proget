@@ -1,9 +1,9 @@
 $FEED_ENDPOINTS = @{
-    list   = '/api/management/feeds/list'
-    get    = '/api/management/feeds/get/{0}'
-    create = '/api/management/feeds/create'
-    update = '/api/management/feeds/update/{0}'
-    delete = '/api/management/feeds/delete/{0}'
+    list   = '/api/management/{0}/list'
+    get    = '/api/management/{0}/get/{1}'
+    create = '/api/management/{0}/create'
+    update = '/api/management/{0}/update/{1}'
+    delete = '/api/management/{0}/delete/{1}'
 }
 
 <#
@@ -162,7 +162,10 @@ Function Get-Feeds {
     )
     
     try {
-        Invoke-ProGetApi -Session $Session -Endpoint $FEED_ENDPOINTS.list -Transform { [Feed]::FromJson($_) }
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.list -f 'feeds') `
+            -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to list feeds: $($_.ErrorDetails.Message)"
@@ -203,7 +206,10 @@ Function Get-Feed {
     )
     
     try {
-        Invoke-ProGetApi -Session $Session -Endpoint ($FEED_ENDPOINTS.get -f $Name) -Transform { [Feed]::FromJson($_) }
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.get -f 'feeds', $Name) `
+            -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to get feed: $($_.ErrorDetails.Message)"
@@ -246,7 +252,12 @@ Function New-Feed {
     )
 
     try {
-        Invoke-ProGetApi -Session $Session -EndPoint $FEED_ENDPOINTS.create -Method POST -Data $Feed -Transform { [Feed]::FromJson($_) }
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.create -f 'feeds') `
+            -Method POST `
+            -Data $Feed `
+            -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to create new feed: $($_.ErrorDetails.Message)"
@@ -291,7 +302,12 @@ Function Set-Feed {
     )
 
     try {
-        Invoke-ProGetApi -Session $Session -EndPoint ($FEED_ENDPOINTS.update -f $feed.Name) -Method POST -Data $Feed -Transform { [Feed]::FromJson($_) }
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.update -f 'feeds', $feed.Name) `
+            -Method POST `
+            -Data $Feed `
+            -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to update feed: $($_.ErrorDetails.Message)"
@@ -332,7 +348,10 @@ Function Remove-Feed {
     )
 
     try {
-        Invoke-ProGetApi -Session $Session -EndPoint ($FEED_ENDPOINTS.delete -f $Name) -Method POST
+        Invoke-ProGetApi `
+            -Session $Session `
+            -EndPoint ($FEED_ENDPOINTS.delete -f 'feeds', $Name) `
+            -Method POST
     }
     catch {
         Write-Error "Unable to delete feed: $($_.ErrorDetails.Message)"
