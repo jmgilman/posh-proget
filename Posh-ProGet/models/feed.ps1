@@ -17,27 +17,30 @@ class Feed {
     [string[]] $Connectors
     [string[]] $VulnerabilitySources
     [RetentionRule[]] $RetentionRules
-    [string[]] $PackageFilters
-    [string[]] $PackageAccessRules
+    [System.Collections.Generic.Dictionary[string, string]] $PackageFilters
+    [System.Collections.Generic.Dictionary[string, string]] $PackageAccessRules
     [ReplicationData] $Replication
     [object] $Variables
 
     static [Feed] FromJson([object] $JsonObject) {
         $feed = [Feed]::new()
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
+            $value = $JsonObject.$($_.Name)
+
             if ($_.Name -eq 'retentionRules') {
-                $feed.$($_.Name) = [RetentionRule]::FromJson($JsonObject.$($_.Name))
+                $feed.$($_.Name) = [RetentionRule]::FromJson($value)
                 continue
             }
 
             if ($_.Name -eq 'replication') {
-                $feed.$($_.Name) = [ReplicationData]::FromJson($JsonObject.$($_.Name))
+                $feed.$($_.Name) = [ReplicationData]::FromJson($value)
                 continue
             }
 
-            $feed.$($_.Name) = $JsonObject.$($_.Name)
+            if ($value) {
+                $feed.$($_.Name) = $value
+            }
         }
-
         return $feed
     }
 }
