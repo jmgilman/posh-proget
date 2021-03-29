@@ -162,7 +162,7 @@ Function Get-Feeds {
     )
     
     try {
-        Invoke-ProGetApi -Session $Session -Endpoint $FEED_ENDPOINTS.list -Transform ${function:[Feed]::FromJson}
+        Invoke-ProGetApi -Session $Session -Endpoint $FEED_ENDPOINTS.list -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to list feeds: $($_.ErrorDetails.Message)"
@@ -203,7 +203,7 @@ Function Get-Feed {
     )
     
     try {
-        Invoke-ProGetApi -Session $Session -Endpoint ($FEED_ENDPOINTS.get -f $Name) -Transform ${function:[Feed]::FromJson}
+        Invoke-ProGetApi -Session $Session -Endpoint ($FEED_ENDPOINTS.get -f $Name) -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to get feed: $($_.ErrorDetails.Message)"
@@ -246,7 +246,7 @@ Function New-Feed {
     )
 
     try {
-        Invoke-ProGetApi -Session $Session -EndPoint $FEED_ENDPOINTS.create -Method POST -Data $Feed -Transform ${function:[Feed]::FromJson}
+        Invoke-ProGetApi -Session $Session -EndPoint $FEED_ENDPOINTS.create -Method POST -Data $Feed -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to create new feed: $($_.ErrorDetails.Message)"
@@ -291,7 +291,7 @@ Function Set-Feed {
     )
 
     try {
-        Invoke-ProGetApi -Session $Session -EndPoint ($FEED_ENDPOINTS.update -f $feed.Name) -Method POST -Data $Feed -Transform ${function:[Feed]::FromJson}
+        Invoke-ProGetApi -Session $Session -EndPoint ($FEED_ENDPOINTS.update -f $feed.Name) -Method POST -Data $Feed -Transform { [Feed]::FromJson($_) }
     }
     catch {
         Write-Error "Unable to update feed: $($_.ErrorDetails.Message)"

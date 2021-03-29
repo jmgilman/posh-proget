@@ -61,14 +61,14 @@ class Connector {
 class RetentionRule {
     [bool] $DeletePrereleaseVersions
     [bool] $DeleteCached
-    $KeepVersionsCount
-    $KeepUsedWithinDays
-    $TriggerDownloadCount
+    [System.Nullable``1[[System.Int32]]] $KeepVersionsCount = $null
+    [System.Nullable``1[[System.Int32]]] $KeepUsedWithinDays = $null
+    [System.Nullable``1[[System.Int32]]] $TriggerDownloadCount = $null
     [string[]] $KeepPackageIds
     [string[]] $DeletePackageIds
     [string[]] $KeepVersions
     [string[]] $DeleteVersions
-    $SizeTriggerKb
+    [System.Nullable``1[[System.Int32]]] $SizeTriggerKb = $null
     [bool] $SizeExclusive
 
     static [RetentionRule] FromJson([object] $JsonObject) {
