@@ -5,6 +5,8 @@ $ASSET_ENDPOINTS = @{
     update    = '/endpoints/{0}/content/{1}'
     delete    = '/endpoints/{0}/delete/{1}'
     directory = '/endpoints/{0}/dir/{1}'
+    export    = '/endpoints/{0}/export/{1}'
+    import    = '/endpoints/{0}/import/{1}'
 }
 
 <#
@@ -383,6 +385,135 @@ Function Remove-Asset {
     }
     catch {
         Write-Error "Unable to remove asset: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Exports the contents of an asset directory into an archive file
+.DESCRIPTION
+    Uses the given ProGet session to connect to the assets API endpoint and 
+    exports the contents of the given path in the given asset feed as an archive
+    file. 
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER FeedName
+    The name of the asset feed for exporting
+.PARAMETER Path
+    The relative path in the feed to export
+.PARAMETER OutFile
+    An optional local path to output the archive to
+.PARAMETER Format
+    The format of the archive file: either zip or tgz
+.PARAMETER Recursive
+    Whether to export all subdirectories under the path
+.EXAMPLE
+    Export-AssetDirectory $session asset-feed -OutFile feed.zip -Recursive 
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    The raw contents of the archive file if OutFile was not specified
+#>
+Function Export-AssetDirectory {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $FeedName,
+        [Parameter(
+            Position = 3
+        )]
+        [string] $Path,
+        [string] $OutFile,
+        [ValidateSet('zip', 'tgz')]
+        [string] $Format = 'zip',
+        [switch] $Recursive = $false
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint (($ASSET_ENDPOINTS.export -f $FeedName, $Path) + "?format=$Format&recursive=$Recursive") `
+            -OutFile $OutFile
+    }
+    catch {
+        Write-Error "Unable to export asset directory: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Imports an archive file into an asset directory
+.DESCRIPTION
+    Uses the given ProGet session to connect to the assets API endpoint and 
+    imports the contents of an archive file into the given path. 
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER FeedName
+    The name of the asset feed to import the archive to
+.PARAMETER Path
+    The relative path in the feed where the contents will be imported
+.PARAMETER InFile
+    The local path to the archive file to import.
+.PARAMETER Format
+    The format of the archive file: either zip or tgz
+.PARAMETER Overwrite
+    Whether to overwrite any files or folders already present at the given path
+.EXAMPLE
+    Import-AssetDirectory -Session $session `
+                          -FeedName asset-feed `
+                          -Path sub/dir `
+                          -InFile ./archive.zip
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    None
+#>
+Function Import-AssetDirectory {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $FeedName,
+        [Parameter(
+            Position = 3
+        )]
+        [string] $Path = '',
+        [Parameter(
+            Mandatory = $true,
+            Position = 4
+        )]
+        [string] $InFile,
+        [ValidateSet('zip', 'tgz')]
+        [string] $Format = 'zip',
+        [switch] $Overwrite = $false
+    )
+    
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint (($ASSET_ENDPOINTS.import -f $FeedName, $Path) + "?format=$Format&overwrite=$Overwrite") `
+            -Method POST `
+            -InFile $InFile
+    }
+    catch {
+        Write-Error "Unable to import asset directory: $($_.ErrorDetails.Message)"
         return
     }
 }

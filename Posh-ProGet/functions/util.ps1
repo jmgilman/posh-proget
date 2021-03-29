@@ -83,6 +83,7 @@ Function Invoke-ProGetApi {
         [string] $ContentType = 'application/json',
         [object] $Data,
         [string] $InFile,
+        [string] $OutFile,
         [scriptblock] $Transform
     )
 
@@ -105,6 +106,10 @@ Function Invoke-ProGetApi {
     }
     elseif ($Data) {
         $params['Body'] = $Data
+    }
+
+    if ($OutFile) {
+        $params['OutFile'] = $OutFile
     }
     
     $result = Invoke-RestMethod @params
