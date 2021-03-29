@@ -47,13 +47,16 @@ Function Invoke-ProGetApi {
         The API endpoint to send the request to
     .PARAMETER Method
         The type of HTTP request to use (defaults to GET)
-    .Parameter ContentType
+    .PARAMETER ContentType
         The content type of the given payload (defaults to Json)
-    .Parameter Data
+    .PARAMETER Data
         The payload to send to the endpoint. If the content type is set to JSON,
         the passed value should be a Powershell object which will be converted
         into JSON before being sent.
-    .Parameter Transform
+    .PARAMETER InFile
+        The file to send to the endpoint as a payload. Overrides anything set
+        within the Data parameter.
+    .PARAMETER Transform
         An optional script block that, if present, will be applied to every 
         object that is returned from the API call. This is typically used to
         turn the JSON response object into something more useful.
@@ -79,6 +82,7 @@ Function Invoke-ProGetApi {
         [string] $Method = 'GET',
         [string] $ContentType = 'application/json',
         [object] $Data,
+        [string] $InFile,
         [scriptblock] $Transform
     )
 
@@ -94,7 +98,13 @@ Function Invoke-ProGetApi {
         Uri         = Join-Uri $Session.Address $EndPoint
         ContentType = $ContentType
         Headers     = $headers
-        Body        = $Data
+    }
+
+    if ($InFile) {
+        $params['InFile'] = $InFile
+    }
+    elseif ($Data) {
+        $params['Body'] = $Data
     }
     
     $result = Invoke-RestMethod @params
