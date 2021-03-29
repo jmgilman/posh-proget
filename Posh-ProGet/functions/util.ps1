@@ -53,6 +53,10 @@ Function Invoke-ProGetApi {
         The payload to send to the endpoint. If the content type is set to JSON,
         the passed value should be a Powershell object which will be converted
         into JSON before being sent.
+    .Parameter Transform
+        An optional script block that, if present, will be applied to every 
+        object that is returned from the API call. This is typically used to
+        turn the JSON response object into something more useful.
     .EXAMPLE
         $json = Invoke-ProGetApi -Session $Session -Endpoint '/api/management/feeds/list'
     .INPUTS
@@ -74,7 +78,8 @@ Function Invoke-ProGetApi {
         [string] $EndPoint,
         [string] $Method = 'GET',
         [string] $ContentType = 'application/json',
-        [object] $Data
+        [object] $Data,
+        [scriptblock] $Transform
     )
 
     if ($ContentType -eq 'application/json') {
@@ -92,5 +97,12 @@ Function Invoke-ProGetApi {
         Body        = $Data
     }
     
-    Invoke-RestMethod @params
+    $result = Invoke-RestMethod @params
+
+    if ($Transform) {
+        $result | ForEach-Object { $Transform.Invoke($_) }
+    }
+    else {
+        $result
+    }
 }
