@@ -48,8 +48,10 @@ Function New-AssetObject {
     The name of the asset feed to fetch against
 .PARAMETER Path
     The relative path in the feed to fetch against (defaults to root folder)
+.PARAMETER Recursive
+    Whether to recursively search the path or not
 .EXAMPLE
-    $assets = Get-Assets $session asset-feed sub/dir
+    $assets = Get-Assets $session asset-feed sub/dir -Recursive
 .INPUTS
     The session can be piped in by value
 .OUTPUTS
@@ -71,13 +73,14 @@ Function Get-Assets {
         [Parameter(
             Position = 3
         )]
-        [string] $Path = ''
+        [string] $Path = '',
+        [switch] $Recursive = $false
     )
     
     try {
         Invoke-ProGetApi `
             -Session $Session `
-            -Endpoint ($ASSET_ENDPOINTS.list -f $FeedName, $Path) `
+            -Endpoint (($ASSET_ENDPOINTS.list -f $FeedName, $Path) + "?recursive=$Recursive") `
             -Transform { [Asset]::FromJson($_) }
     }
     catch {
