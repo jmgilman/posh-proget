@@ -79,9 +79,6 @@ Function Invoke-ProGetApi {
 
     if ($ContentType -eq 'application/json') {
         $Data = ConvertTo-Json $Data -Depth 3
-        
-        # TODO: temporary workaround since the API won't take zeroes, it wants 'null'
-        $Data = $Data -replace ': 0,', ': null,'
     }
 
     $headers = @{
