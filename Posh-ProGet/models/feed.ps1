@@ -70,9 +70,9 @@ class Connector {
 class RetentionRule {
     [bool] $DeletePrereleaseVersions
     [bool] $DeleteCached
-    [System.Nullable``1[[System.Int32]]] $KeepVersionsCount = $null
-    [System.Nullable``1[[System.Int32]]] $KeepUsedWithinDays = $null
-    [System.Nullable``1[[System.Int32]]] $TriggerDownloadCount = $null
+    [Nullable[int]] $KeepVersionsCount = $null
+    [Nullable[int]] $KeepUsedWithinDays = $null
+    [Nullable[int]] $TriggerDownloadCount = $null
     [string[]] $KeepPackageIds
     [string[]] $DeletePackageIds
     [string[]] $KeepVersions
