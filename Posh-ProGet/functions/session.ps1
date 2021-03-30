@@ -1,4 +1,4 @@
-Function New-ProGetSession {
+Function New-Session {
     param(
         [string] $Address,
         [string] $ApiToken
