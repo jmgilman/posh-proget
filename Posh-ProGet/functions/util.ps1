@@ -39,7 +39,7 @@ Function Invoke-ProGetApi {
         Web API. It uses the connection and authentication information from an
         existing ProGetSession object (see New-ProgetSession) and sends a
         request to the given endpoint with the (optional) given payload. The
-        return value comes directly from the Powershell Invoke-RestMethod 
+        return value comes directly from the Powershell Invoke-RestMethod
         function.
     .PARAMETER Session
         An existing ProGetSession object used to connect to the API
@@ -57,7 +57,7 @@ Function Invoke-ProGetApi {
         The file to send to the endpoint as a payload. Overrides anything set
         within the Data parameter.
     .PARAMETER Transform
-        An optional script block that, if present, will be applied to every 
+        An optional script block that, if present, will be applied to every
         object that is returned from the API call. This is typically used to
         turn the JSON response object into something more useful.
     .EXAMPLE
@@ -111,7 +111,7 @@ Function Invoke-ProGetApi {
     if ($OutFile) {
         $params['OutFile'] = $OutFile
     }
-    
+
     $result = Invoke-RestMethod @params
 
     if ($Transform) {

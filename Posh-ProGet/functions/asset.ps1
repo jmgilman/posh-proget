@@ -40,7 +40,7 @@ Function New-AssetObject {
     Fetches a list of all assets contained within the given asset feed at the
     given ath
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     fetch all assets contained within the given feed name and located at the
     given relative path. Note that the relative path should omit the leading
     slash (i.e. 'sub/dir' instead of '/sub/dir').
@@ -78,7 +78,7 @@ Function Get-Assets {
         [string] $Path = '',
         [switch] $Recursive = $false
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -95,7 +95,7 @@ Function Get-Assets {
 .SYNOPSIS
     Fetches the contents of an asset from the given feed at the given path
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     fetch the asset contents at the given path from the given asset feed.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -132,7 +132,7 @@ Function Get-Asset {
         [string] $Path,
         [string] $OutFile
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -149,7 +149,7 @@ Function Get-Asset {
 .SYNOPSIS
     Creates a new asset in the given asset feed
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     creates a new asset in the given feed at the given path
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -201,7 +201,7 @@ Function New-Asset {
         [object] $Content,
         [string] $InFile
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -221,7 +221,7 @@ Function New-Asset {
 .SYNOPSIS
     Creates a new asset directory in the given asset feed
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     creates a new asset directory in the given feed with the given path
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -257,7 +257,7 @@ Function New-AssetDirectory {
         )]
         [string] $Path
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -274,7 +274,7 @@ Function New-AssetDirectory {
 .SYNOPSIS
     Update an asset in the given asset feed
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     update an asset in the given feed at the given path
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -287,7 +287,7 @@ Function New-AssetDirectory {
 .PARAMETER Content
     The modified contents of the asset
 .PARAMETER InFile
-    The local path to the modified asset file to upload. This overrides anything 
+    The local path to the modified asset file to upload. This overrides anything
     set in the Content parameter.
 .EXAMPLE
     Set-Asset -Session $session `
@@ -326,7 +326,7 @@ Function Set-Asset {
         [object] $Content,
         [string] $InFile
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -346,7 +346,7 @@ Function Set-Asset {
 .SYNOPSIS
     Removes an asset from the given feed at the given path
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     removes the asset at the given path from the given asset feed.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -380,7 +380,7 @@ Function Remove-Asset {
         )]
         [string] $Path
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -397,9 +397,9 @@ Function Remove-Asset {
 .SYNOPSIS
     Exports the contents of an asset directory into an archive file
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
+    Uses the given ProGet session to connect to the assets API endpoint and
     exports the contents of the given path in the given asset feed as an archive
-    file. 
+    file.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
 .PARAMETER FeedName
@@ -413,7 +413,7 @@ Function Remove-Asset {
 .PARAMETER Recursive
     Whether to export all subdirectories under the path
 .EXAMPLE
-    Export-AssetDirectory $session asset-feed -OutFile feed.zip -Recursive 
+    Export-AssetDirectory $session asset-feed -OutFile feed.zip -Recursive
 .INPUTS
     The session can be piped in by value
 .OUTPUTS
@@ -441,7 +441,7 @@ Function Export-AssetDirectory {
         [string] $Format = 'zip',
         [switch] $Recursive = $false
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -458,8 +458,8 @@ Function Export-AssetDirectory {
 .SYNOPSIS
     Imports an archive file into an asset directory
 .DESCRIPTION
-    Uses the given ProGet session to connect to the assets API endpoint and 
-    imports the contents of an archive file into the given path. 
+    Uses the given ProGet session to connect to the assets API endpoint and
+    imports the contents of an archive file into the given path.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
 .PARAMETER FeedName
@@ -508,7 +508,7 @@ Function Import-AssetDirectory {
         [string] $Format = 'zip',
         [switch] $Overwrite = $false
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `

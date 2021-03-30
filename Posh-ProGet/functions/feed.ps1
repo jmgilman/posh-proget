@@ -160,7 +160,7 @@ Function Get-Feeds {
         )]
         [ProGetSession] $Session
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -197,7 +197,7 @@ Function Get-Connectors {
         )]
         [ProGetSession] $Session
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -234,7 +234,7 @@ Function Get-Licenses {
         )]
         [ProGetSession] $Session
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -278,7 +278,7 @@ Function Get-Feed {
         )]
         [string] $Name
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -322,7 +322,7 @@ Function Get-Connector {
         )]
         [string] $Name
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -366,7 +366,7 @@ Function Get-License {
         )]
         [string] $LicenseID
     )
-    
+
     try {
         Invoke-ProGetApi `
             -Session $Session `
@@ -480,7 +480,7 @@ Function New-Connector {
     Creates a new license using the given License object
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
-    create a new license using the properties passed in the given LicenseData 
+    create a new license using the properties passed in the given LicenseData
     object.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
@@ -580,7 +580,7 @@ Function Set-Feed {
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and
     update a license using the given LicenseData object. Note that the LicenseID
-    property of the LicenseData object is what determines which license is 
+    property of the LicenseData object is what determines which license is
     updated in the backend.
 .PARAMETER Session
     An existing ProGetSession object used to connect to the API
