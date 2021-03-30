@@ -12,11 +12,11 @@ class Asset {
     [string] $Sha512
 
     static [Asset] FromJson([object] $JsonObject) {
-        $replication = [Asset]::new()
+        $asset = [Asset]::new()
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $replication.$($_.Name) = $JsonObject.$($_.Name)
+            $asset.$($_.Name) = $JsonObject.$($_.Name)
         }
 
-        return $replication
+        return $asset
     }
 }
