@@ -4,6 +4,7 @@ $FEED_ENDPOINTS = @{
     create = '/api/management/{0}/create'
     update = '/api/management/{0}/update/{1}'
     delete = '/api/management/{0}/delete/{1}'
+    health = '/api/connector-health/{0}'
 }
 
 <#
@@ -212,6 +213,44 @@ Function Get-Connectors {
 
 <#
 .SYNOPSIS
+    Fetches the health of all connectors from the ProGet API
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    the health of all connectors, returning them as an array of ConnectorHealth 
+    objects.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.EXAMPLE
+    $health = Get-ConnectorsHealth $session
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    An array of ConnectorHealth objects
+#>
+Function Get-ConnectorsHealth {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.health -f '') `
+            -Transform { [ConnectorHealth]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to get connectors health: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
     Fetches a list of all licenses from the ProGet API
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and fetch
@@ -331,6 +370,50 @@ Function Get-Connector {
     }
     catch {
         Write-Error "Unable to get connector: $($_.ErrorDetails.Message)"
+        return
+    }
+}
+
+<#
+.SYNOPSIS
+    Fetches the health of the given connector
+.DESCRIPTION
+    Uses the given ProGet session to connect to the feeds API endpoint and fetch
+    the health of the given connector, returning it as a ConnectorHealth object.
+.PARAMETER Session
+    An existing ProGetSession object used to connect to the API
+.PARAMETER Id
+    The ID of the connector to get
+.EXAMPLE
+    $health = Get-ConnectorHealth $session 5
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    A ConnectorHealth object
+#>
+Function Get-ConnectorHealth {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [string] $Id
+    )
+
+    try {
+        Invoke-ProGetApi `
+            -Session $Session `
+            -Endpoint ($FEED_ENDPOINTS.health -f $Id) `
+            -Transform { [ConnectorHealth]::FromJson($_) }
+    }
+    catch {
+        Write-Error "Unable to get connector health: $($_.ErrorDetails.Message)"
         return
     }
 }

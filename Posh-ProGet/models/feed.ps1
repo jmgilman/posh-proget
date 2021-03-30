@@ -67,6 +67,24 @@ class Connector {
     }
 }
 
+class ConnectorHealth {
+    [string] $Name
+    [string] $Id
+    [string] $Url
+    [string] $State
+    [string] $ErrorMessage
+    [Nullable[DateTime]] $LastChecked = $null
+
+    static [ConnectorHealth] FromJson([object] $JsonObject) {
+        $health = [ConnectorHealth]::new()
+        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
+            $health.$($_.Name) = $JsonObject.$($_.Name)
+        }
+
+        return $health
+    }
+}
+
 class RetentionRule {
     [bool] $DeletePrereleaseVersions
     [bool] $DeleteCached
@@ -77,7 +95,7 @@ class RetentionRule {
     [string[]] $DeletePackageIds
     [string[]] $KeepVersions
     [string[]] $DeleteVersions
-    [System.Nullable``1[[System.Int32]]] $SizeTriggerKb = $null
+    [Nullable[int]] $SizeTriggerKb = $null
     [bool] $SizeExclusive
 
     static [RetentionRule] FromJson([object] $JsonObject) {
