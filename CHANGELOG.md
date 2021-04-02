@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2021-04-02
+
 ### Added
 
 - Support for getting connector health
@@ -18,5 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[unreleased]: https://github.com/jmgilman/posh-proget/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/jmgilman/posh-proget/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/jmgilman/posh-proget/compare/v0.0.2...v0.0.1
 [0.0.1]: https://github.com/jmgilman/posh-proget/releases/tag/v0.0.1
