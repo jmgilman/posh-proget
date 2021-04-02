@@ -26,7 +26,7 @@ class Feed {
         $feed = [Feed]::new()
 
         if (!$JsonObject) {
-            return $feed
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
@@ -66,7 +66,7 @@ class Connector {
         $conn = [Connector]::new()
 
         if (!$JsonObject) {
-            return $conn
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
@@ -89,7 +89,7 @@ class ConnectorHealth {
         $health = [ConnectorHealth]::new()
 
         if (!$JsonObject) {
-            return $health
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
@@ -117,7 +117,7 @@ class RetentionRule {
         $rule = [RetentionRule]::new()
 
         if (!$JsonObject) {
-            return $rule
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
@@ -139,7 +139,7 @@ class ReplicationData {
         $replication = [ReplicationData]::new()
 
         if (!$JsonObject) {
-            return $replication
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
@@ -162,7 +162,7 @@ class LicenseData {
         $license = [LicenseData]::new()
 
         if (!$JsonObject) {
-            return $license
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {

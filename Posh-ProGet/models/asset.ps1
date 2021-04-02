@@ -15,7 +15,7 @@ class Asset {
         $asset = [Asset]::new()
 
         if (!$JsonObject) {
-            return $asset
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {

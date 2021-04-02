@@ -13,7 +13,7 @@ class ServerHealth {
         $health = [ServerHealth]::new()
 
         if (!$JsonObject) {
-            return $health
+            return $null
         }
 
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
