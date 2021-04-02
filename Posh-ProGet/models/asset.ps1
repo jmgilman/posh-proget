@@ -13,6 +13,11 @@ class Asset {
 
     static [Asset] FromJson([object] $JsonObject) {
         $asset = [Asset]::new()
+
+        if (!$JsonObject) {
+            return $asset
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $asset.$($_.Name) = $JsonObject.$($_.Name)
         }

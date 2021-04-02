@@ -24,6 +24,11 @@ class Feed {
 
     static [Feed] FromJson([object] $JsonObject) {
         $feed = [Feed]::new()
+
+        if (!$JsonObject) {
+            return $feed
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $value = $JsonObject.$($_.Name)
 
@@ -59,6 +64,11 @@ class Connector {
 
     static [Connector] FromJson([object] $JsonObject) {
         $conn = [Connector]::new()
+
+        if (!$JsonObject) {
+            return $conn
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $conn.$($_.Name) = $JsonObject.$($_.Name)
         }
@@ -77,6 +87,11 @@ class ConnectorHealth {
 
     static [ConnectorHealth] FromJson([object] $JsonObject) {
         $health = [ConnectorHealth]::new()
+
+        if (!$JsonObject) {
+            return $health
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $health.$($_.Name) = $JsonObject.$($_.Name)
         }
@@ -100,6 +115,11 @@ class RetentionRule {
 
     static [RetentionRule] FromJson([object] $JsonObject) {
         $rule = [RetentionRule]::new()
+
+        if (!$JsonObject) {
+            return $rule
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $rule.$($_.Name) = $JsonObject.$($_.Name)
         }
@@ -117,6 +137,11 @@ class ReplicationData {
 
     static [ReplicationData] FromJson([object] $JsonObject) {
         $replication = [ReplicationData]::new()
+
+        if (!$JsonObject) {
+            return $replication
+        }
+
         $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
             $replication.$($_.Name) = $JsonObject.$($_.Name)
         }
@@ -134,11 +159,16 @@ class LicenseData {
     [string[]] $BlockedFeeds = @()
 
     static [LicenseData] FromJson([object] $JsonObject) {
-        $replication = [LicenseData]::new()
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $replication.$($_.Name) = $JsonObject.$($_.Name)
+        $license = [LicenseData]::new()
+
+        if (!$JsonObject) {
+            return $license
         }
 
-        return $replication
+        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
+            $license.$($_.Name) = $JsonObject.$($_.Name)
+        }
+
+        return $license
     }
 }
