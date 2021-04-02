@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for getting connector health
+- Function for getting feed URL
 
 ## [0.0.1] - 2021-03-29
 

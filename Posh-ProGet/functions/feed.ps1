@@ -332,6 +332,91 @@ Function Get-Feed {
 
 <#
 .SYNOPSIS
+    Returns, if applicable, the third-party URL for accessing the given feed
+.DESCRIPTION
+    Using the given session and feed object, determines the type and then 
+    returns the third-party (i.e. NuGet) URL to the feed.
+.PARAMETER Session
+    The session used to generate the URL
+.PARAMETER Feed
+    The feed object to generate the URL for
+.EXAMPLE
+    # Returns http://proget.mysite.com/nuget/{feed_name}
+    $url = Get-FeedUrl $nuget_feed
+.INPUTS
+    The session can be piped in by value
+.OUTPUTS
+    A string URL
+#>
+Function Get-FeedUrl {
+    param(
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [ProGetSession] $Session,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [Feed] $Feed
+    )
+
+    switch ($Feed.FeedType) {
+        asset {
+            return Join-Uri $Session.Address "endpoints/$($Feed.Name)"
+        }
+        bower {
+            return Join-Uri $Session.Address "bower/$($Feed.Name)"
+        }
+        chocolatey {
+            return Join-Uri $Session.Address "nuget/$($Feed.Name)"
+        }
+        debian {
+            return Join-Uri $Session.Address "debian-feeds/$($Feed.Name)"
+        }
+        docker {
+            return Join-Uri $Session.Address $Feed.Name
+        }
+        helm {
+            return Join-Uri $Session.Address "helm/$($Feed.Name)"
+        }
+        maven {
+            return Join-Uri $Session.Address "maven2/$($Feed.Name)"
+        }
+        npm {
+            return Join-Uri $Session.Address "npm/$($Feed.Name)"
+        }
+        nuget {
+            return Join-Uri $Session.Address "nuget/$($Feed.Name)"
+        }
+        powershell {
+            return Join-Uri $Session.Address "nuget/$($Feed.Name)"
+        }
+        pypi {
+            return Join-Uri $Session.Address "pypi/$($Feed.Name)"
+        }
+        romp {
+            return Join-Uri $Session.Address "upack/$($Feed.Name)"
+        }
+        rpm {
+            return Join-Uri $Session.Address "rpm/$($Feed.Name)"
+        }
+        rubygems {
+            return Join-Uri $Session.Address "rubygems/$($Feed.Name)"
+        }
+        universal {
+            return Join-Uri $Session.Address "upack/$($Feed.Name)"
+        }
+        vsix {
+            return Join-Uri $Session.Address "vsix/$($Feed.Name)"
+        }
+    }
+}
+
+<#
+.SYNOPSIS
     Fetches a connector with the given name
 .DESCRIPTION
     Uses the given ProGet session to connect to the feeds API endpoint and fetch

@@ -55,6 +55,7 @@
         'Get-ConnectorsHealth',
         'Get-Licenses',
         'Get-Feed',
+        'Get-FeedUrl',
         'Get-Connector',
         'Get-ConnectorHealth',
         'Get-License',
