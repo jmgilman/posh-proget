@@ -121,3 +121,48 @@ Function Invoke-ProGetApi {
         $result
     }
 }
+
+Function JsonToClass {
+    <#
+    .SYNOPSIS
+        Converts a JSON object to the given class object
+    .PARAMETER JsonObject
+        The JSON object
+    .PARAMETER ClassObject
+        The class object
+    .EXAMPLE
+        JsonToClass $json_result ([MyClass]::new())
+    .INPUTS
+        The JSON object can be piped in by type
+    .OUTPUTS
+        The converted class object
+    #>
+    param([Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 1
+        )]
+        [object] $JsonObject,
+        [Parameter(
+            Mandatory = $true,
+            Position = 2
+        )]
+        [object] $ClassObject
+    )
+    
+    if (!$JsonObject) {
+        return $null
+    }
+
+    $properties = $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty'
+    foreach ($property in $properties) {
+        try {
+            $ClassObject.$($property.Name) = $JsonObject.$($property.Name)
+        }
+        catch {
+            continue
+        }
+    }
+
+    return $ClassObject
+}

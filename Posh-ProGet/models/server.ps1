@@ -10,16 +10,6 @@ class ServerHealth {
     [string] $ReplicationHealth
 
     static [ServerHealth] FromJson([object] $JsonObject) {
-        $health = [ServerHealth]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $health.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $health
+        return JsonToClass $JsonObject ([ServerHealth]::new())
     }
 }

@@ -12,16 +12,6 @@ class Asset {
     [string] $Sha512
 
     static [Asset] FromJson([object] $JsonObject) {
-        $asset = [Asset]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $asset.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $asset
+        return JsonToClass $JsonObject ([Asset]::new())
     }
 }

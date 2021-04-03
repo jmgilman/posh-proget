@@ -29,21 +29,22 @@ class Feed {
             return $null
         }
 
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $value = $JsonObject.$($_.Name)
+        $properties = $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty'
+        foreach ($property in $properties) {
+            $value = $JsonObject.$($property.Name)
 
-            if ($_.Name -eq 'retentionRules') {
-                $feed.$($_.Name) = [RetentionRule]::FromJson($value)
+            if ($property.Name -eq 'retentionRules') {
+                $feed.$($property.Name) = [RetentionRule]::FromJson($value)
                 continue
             }
 
-            if ($_.Name -eq 'replication') {
-                $feed.$($_.Name) = [ReplicationData]::FromJson($value)
+            if ($property.Name -eq 'replication') {
+                $feed.$($property.Name) = [ReplicationData]::FromJson($value)
                 continue
             }
 
             if ($value) {
-                $feed.$($_.Name) = $value
+                $feed.$($property.Name) = $value
             }
         }
         return $feed
@@ -63,17 +64,7 @@ class Connector {
     [int] $MetaDataCacheCount
 
     static [Connector] FromJson([object] $JsonObject) {
-        $conn = [Connector]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $conn.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $conn
+        return JsonToClass $JsonObject ([Connector]::new())
     }
 }
 
@@ -86,17 +77,7 @@ class ConnectorHealth {
     [Nullable[DateTime]] $LastChecked = $null
 
     static [ConnectorHealth] FromJson([object] $JsonObject) {
-        $health = [ConnectorHealth]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $health.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $health
+        return JsonToClass $JsonObject ([ConnectorHealth]::new())
     }
 }
 
@@ -114,17 +95,7 @@ class RetentionRule {
     [bool] $SizeExclusive
 
     static [RetentionRule] FromJson([object] $JsonObject) {
-        $rule = [RetentionRule]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $rule.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $rule
+        return JsonToClass $JsonObject ([RetentionRule]::new())
     }
 }
 
@@ -136,17 +107,7 @@ class ReplicationData {
     [string] $SourceUrl
 
     static [ReplicationData] FromJson([object] $JsonObject) {
-        $replication = [ReplicationData]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $replication.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $replication
+        return JsonToClass $JsonObject ([ReplicationData]::new())
     }
 }
 
@@ -159,16 +120,6 @@ class LicenseData {
     [string[]] $BlockedFeeds = @()
 
     static [LicenseData] FromJson([object] $JsonObject) {
-        $license = [LicenseData]::new()
-
-        if (!$JsonObject) {
-            return $null
-        }
-
-        $JsonObject | Get-Member | Where-Object MemberType -EQ 'NoteProperty' | ForEach-Object {
-            $license.$($_.Name) = $JsonObject.$($_.Name)
-        }
-
-        return $license
+        return JsonToClass $JsonObject ([LicenseData]::new())
     }
 }
